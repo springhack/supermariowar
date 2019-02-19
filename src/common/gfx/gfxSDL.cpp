@@ -201,7 +201,23 @@ void GraphicsSDL::RecreateWindow(bool fullscreen)
     sdl2_window = SDL_CreateWindow("smw",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         GFX_SCREEN_W, GFX_SCREEN_H,
-        fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+        fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_RESIZABLE);
+
+    char* sdl_res = strdup(getenv("SDL_RES"));
+    if (!sdl_res) {
+      sdl_res = "320x240";
+    }
+
+    char* str_sdl_width = sdl_res;
+    char* str_sdl_height = strchr(sdl_res, 'x');
+    (*str_sdl_height++) = '\0';
+
+    int sdl_width = atoi(str_sdl_width);
+    int sdl_height = atoi(str_sdl_height);
+
+    free(sdl_res);
+
+    SDL_SetWindowSize(sdl2_window, sdl_width, sdl_height);
 
     if (!sdl2_window) {
         fprintf(stderr, "[gfx] Couldn't create window: %s\n", SDL_GetError());
@@ -260,7 +276,7 @@ void GraphicsSDL::FlipScreen()
 
 void GraphicsSDL::RecreateWindow(bool fullscreen)
 {
-    Uint32 flags = SDL_SWSURFACE | SDL_HWACCEL;
+    Uint32 flags = SDL_SWSURFACE | SDL_HWACCEL | SDL_RESIZABLE;
     if (fullscreen)
         flags |= SDL_FULLSCREEN;
 
